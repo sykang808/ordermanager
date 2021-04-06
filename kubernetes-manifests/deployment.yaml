@@ -1,12 +1,16 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ordermanager
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ordermanager
+  namespace: ordermanager
   labels:
     app: ordermanager
-  namespace: default
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: ordermanager
@@ -24,6 +28,9 @@ spec:
       - image: 566034038752.dkr.ecr.us-west-2.amazonaws.com/sykang/ordermanager:latest
         imagePullPolicy: Always
         name: ordermanager
+        ports:
+        - containerPort: 80
+          protocol: TCP
 ---          
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler

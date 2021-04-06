@@ -9,7 +9,7 @@ import logging
 BOOTSTRAP_SERVERS = ['sykang-kafka.default.svc.cluster.local:9092']
 
 class OrderManager():
-    producer = KafkaProducer(acks=0, compression_type='gzip', bootstrap_servers='sykang-kafka-0.sykang-kafka-headless.default.svc.cluster.local:9092', value_serializer=lambda v: json.dumps(v, sort_keys=True).encode('utf-8'))  
+    producer = KafkaProducer(acks=0, compression_type='gzip',security_protocol="SSL" ,bootstrap_servers=['b-2.microservice-kafka-2.6lxf1h.c6.kafka.us-west-2.amazonaws.com:9094','b-1.microservice-kafka-2.6lxf1h.c6.kafka.us-west-2.amazonaws.com:9094'], value_serializer=lambda v: json.dumps(v, sort_keys=True).encode('utf-8')) 
     ret_fin = 0
     ret_message = ''
 
@@ -51,7 +51,7 @@ class OrderManager():
         json_data = json.loads(data.value.decode("utf-8"))
         status = json_data['status']
     #   print( json_data['id'])
-        url= 'http://flask-orderlist-restapi:5050/orderlist/' + str(json_data['id'])
+        url= 'http://flask-orderlist-restapi.flask-orderlist-restapi/orderlist/' + str(json_data['id'])
         t_data = {"status": status}
         ret_json = json.dumps(t_data)
         r = requests.patch( url,data=ret_json)

@@ -51,7 +51,7 @@ class OrderManager():
         json_data = json.loads(data.value.decode("utf-8"))
         status = json_data['status']
     #   print( json_data['id'])
-        url= 'http://flask-orderlist-restapi.flask-orderlist-restapi/orderlist/' + str(json_data['id'])
+        url= 'http://a6849b09183384f9c86356924d405317-911374521.us-west-2.elb.amazonaws.com/orderlist/' + str(json_data['id'])
         t_data = {"status": status}
         ret_json = json.dumps(t_data)
         r = requests.patch( url,data=ret_json)

@@ -46,8 +46,6 @@ class OrderManager():
 
 
     def kafka_listener(self, data):
-    #   print("ordermanager:", data.value.decode("utf-8"))
-        
         json_data = json.loads(data.value.decode("utf-8"))
         status = json_data['status']
     #   print( json_data['id'])

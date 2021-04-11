@@ -6,7 +6,6 @@ metadata:
     app: ordermanager
   namespace: default
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: ordermanager

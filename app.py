@@ -59,7 +59,7 @@ class OrderManager():
                 self.sendkafka("userkafka", json_data, "checkuser")
             elif status == "success-kafka-user":
                 self.sendkafka("creditkafka", json_data, "checkcredit")
-            elif status == "success-kafka-credit":
+            elif status == "success-kafka-credit" or status == "recovery-kafka-credit":
                 self.sendkafka("deliverykafka", json_data, "checkdelivery") 
             elif status == "fail-reduce-kafka-user" or status == "fail-lack-kafka-user" or status == "fail-kafka-user" or status == "fail-kafka-delivery" or status == "fail-kafka-credit":
                 self.sendkafka("recoverykafka", json_data , status )

@@ -41,7 +41,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: ordermanager
-  minReplicas: 1
+  minReplicas: 4
   maxReplicas: 4
   metrics:
     - type: Resource

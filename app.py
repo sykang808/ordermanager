@@ -6,6 +6,10 @@ import requests
 import threading
 import json
 import logging
+import time
+import boto3
+
+
 BOOTSTRAP_SERVERS = ['b-2.microservice-kafka-2.6lxf1h.c6.kafka.us-west-2.amazonaws.com:9094','b-1.microservice-kafka-2.6lxf1h.c6.kafka.us-west-2.amazonaws.com:9094']
 
 class OrderManager():
@@ -65,9 +69,32 @@ class OrderManager():
                 self.sendkafka("recoverykafka", json_data , status )
                                       
         print( r.content, self.ret_fin )
-         
+
+
+def get_kafka_bootstriap(parameterName):
+    cloudformation = boto3.client('cloudformation')
+    stack = cloudformation.describe_stacks(
+        StackName='MicroserviceCDKVPC'
+    )
+ #   response = json.loads(response)
+    
+    for output in stack['Stacks'][0]['Outputs']:
+        if output['OutputKey'] == parameterName :
+            ssm = boto3.client('ssm')
+            parameter = ssm.get_parameter(Name=output['OutputValue'], WithDecryption=True)
+            return parameter['Parameter']['Value'].split(',')
+
 if __name__ == '__main__':
-#    OrderManager.register_kafka_listener('orderkafka')
+    #    OrderManager.register_kafka_listener('orderkafka')
 #   app.run(host="0.0.0.0", port=5052,debug=True)
-    ordermanager = OrderManager()
-    ordermanager.register_kafka_listener('orderkafka')
+    BOOTSTRAP_SERVERS = get_kafka_bootstriap('mskbootstriapbrokers')
+
+    ordermanager1 = OrderManager()
+    ordermanager2 = OrderManager()
+    ordermanager3 = OrderManager()
+    ordermanager4 = OrderManager()
+
+    ordermanager1.register_kafka_listener('orderkafka')
+    ordermanager2.register_kafka_listener('orderkafka')
+    ordermanager3.register_kafka_listener('orderkafka')
+    ordermanager4.register_kafka_listener('orderkafka')    

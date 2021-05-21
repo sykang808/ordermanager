@@ -5,14 +5,15 @@ from json import dumps
 import requests
 import threading
 import json
-import logging
-import time
 import boto3
+from botocore.config import Config
 
-
-BOOTSTRAP_SERVERS = ['b-2.microservice-kafka-2.6lxf1h.c6.kafka.us-west-2.amazonaws.com:9094','b-1.microservice-kafka-2.6lxf1h.c6.kafka.us-west-2.amazonaws.com:9094']
-
-cloudformation_client = boto3.client('cloudformation')
+my_config = Config(
+    region_name='us-west-2',
+)
+#t = get_secret()
+#print(DATABASE_CONFIG)
+cloudformation_client = boto3.client('cloudformation', config=my_config)
 response = cloudformation_client.describe_stacks(
     StackName='MicroserviceCDKVPC'
 )
@@ -24,15 +25,15 @@ for output in outputs:
         ParameterKey = output["OutputValue"]
 
 print( ParameterKey )
-ssm_client = boto3.client('ssm')
+ssm_client = boto3.client('ssm', config=my_config)
 response = ssm_client.get_parameter(
     Name=ParameterKey
 )
-
 BOOTSTRAP_SERVERS = response['Parameter']['Value'].split(',')
-print(BOOTSTRAP_SERVERS)
+
+
 class OrderManager():
-    producer = KafkaProducer(acks=0,security_protocol="SSL", compression_type='gzip', bootstrap_servers=BOOTSTRAP_SERVERS, value_serializer=lambda v: json.dumps(v, sort_keys=True).encode('utf-8'))  
+    producer = KafkaProducer(bootstrap_servers=BOOTSTRAP_SERVERS, security_protocol="SSL")    
     ret_fin = 0
     ret_message = ''
 
@@ -90,24 +91,38 @@ class OrderManager():
         print( r.content, self.ret_fin )
 
 
-def get_kafka_bootstriap(parameterName):
-    cloudformation = boto3.client('cloudformation')
-    stack = cloudformation.describe_stacks(
+def get_kafka_bootstriap():
+    my_config = Config(
+        region_name='us-west-2',
+    )
+    #t = get_secret()
+    #print(DATABASE_CONFIG)
+    cloudformation_client = boto3.client('cloudformation', config=my_config)
+    response = cloudformation_client.describe_stacks(
         StackName='MicroserviceCDKVPC'
     )
- #   response = json.loads(response)
-    
-    for output in stack['Stacks'][0]['Outputs']:
-        if output['OutputKey'] == parameterName :
-            ssm = boto3.client('ssm')
-            parameter = ssm.get_parameter(Name=output['OutputValue'], WithDecryption=True)
-            return parameter['Parameter']['Value'].split(',')
+    ParameterKey=''
+    outputs = response["Stacks"][0]["Outputs"]
+    for output in outputs:
+        keyName = output["OutputKey"]
+        if keyName == "mskbootstriapbrokers":
+            ParameterKey = output["OutputValue"]
+
+    print( ParameterKey )
+    ssm_client = boto3.client('ssm', config=my_config)
+    response = ssm_client.get_parameter(
+        Name=ParameterKey
+    )
+    print(response['Parameter']['Value'].split(','))
+    return response['Parameter']['Value'].split(',')
 
 if __name__ == '__main__':
     #    OrderManager.register_kafka_listener('orderkafka')
 #   app.run(host="0.0.0.0", port=5052,debug=True)
-    BOOTSTRAP_SERVERS = get_kafka_bootstriap('mskbootstriapbrokers')
 
+
+#    BOOTSTRAP_SERVERS = get_kafka_bootstriap('mskbootstriapbrokers')
+    print(BOOTSTRAP_SERVERS)
     ordermanager1 = OrderManager()
     ordermanager2 = OrderManager()
     ordermanager3 = OrderManager()

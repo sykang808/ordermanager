@@ -149,4 +149,3 @@ if __name__ == '__main__':
     ordermanager6.register_kafka_listener('orderkafka')
     ordermanager7.register_kafka_listener('orderkafka')
     ordermanager8.register_kafka_listener('orderkafka') 
-    app.run(host="0.0.0.0", port=80,debug=True)

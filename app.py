@@ -9,12 +9,11 @@ import threading
 import json
 import boto3
 from botocore.config import Config
-
 from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
 
 app = Flask(__name__)
-
+api = Api(app)
 xray_recorder.configure(service='ordermanager')
 XRayMiddleware(app, xray_recorder)
 
@@ -150,3 +149,4 @@ if __name__ == '__main__':
     ordermanager6.register_kafka_listener('orderkafka')
     ordermanager7.register_kafka_listener('orderkafka')
     ordermanager8.register_kafka_listener('orderkafka') 
+    app.run(host="0.0.0.0", port=80,debug=True)
